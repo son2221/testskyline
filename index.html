@@ -1,48 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKYLINE - Emergency Help</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKYLINE - Emergency Help</title>
+  <style>
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
       background: linear-gradient(to bottom, #4caf50, #ffeb3b);
       color: #333;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-attachment: fixed;
     }
 
-    /* Home Page UI */
+    /* Home Page UI with Modern Glassmorphism */
     .home-page {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 80vh;
       text-align: center;
       flex-direction: column;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 50px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      color: white;
+      transition: all 0.3s ease-in-out;
     }
 
     .home-page h1 {
-      font-size: 2.5rem;
+      font-size: 4rem;
       margin-bottom: 15px;
-      font-weight: bold;
-      color: #4caf50;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .home-page p {
+      font-size: 1.6rem;
+      color: #ddd;
+      margin-bottom: 30px;
     }
 
     .button {
       background-color: #4caf50;
-      padding: 15px 30px;
+      padding: 18px 35px;
       color: white;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       border: none;
-      border-radius: 30px;
+      border-radius: 50px;
       cursor: pointer;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
     }
 
     .button:hover {
@@ -50,110 +64,304 @@
       transform: scale(1.05);
     }
 
-    /* AdBlock Modal */
-    #adblock-warning, #manual-location {
+    /* Loading Animation */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s ease-out, visibility 1s ease-out;
+    }
+
+    .loading-spinner {
+      border: 10px solid #f3f3f3;
+      border-top: 10px solid #4caf50;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Main Content with Modern Glassmorphism */
+    .main-container {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 50px;
+      backdrop-filter: blur(25px);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+      transform: scale(0.8);
+    }
+
+    .navbar {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      background-color: #4caf50;
+      border-radius: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .navbar a:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    /* Location Confirmation Modal */
+    #location-confirmation {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
+      backdrop-filter: blur(15px);
+      animation: slideIn 0.5s ease-out;
     }
 
-    #adblock-warning p, #manual-location p {
+    #location-confirmation p {
+      font-size: 1.4rem;
+      margin-bottom: 25px;
+    }
+
+    #location-confirmation button {
+      background-color: #4caf50;
+      padding: 12px 22px;
+      color: white;
       font-size: 1.2rem;
-      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 10px;
     }
 
-    #manual-location input {
-      padding: 8px;
-      width: 80%;
-      margin-bottom: 10px;
+    #location-confirmation button:hover {
+      background-color: #45a049;
     }
-</style>
+
+    /* Slide-in effect */
+    @keyframes slideIn {
+      0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Error UI with Modern Glassmorphism */
+    #error-ui {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(244, 67, 54, 0.9);
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      animation: shakeError 0.5s ease-out;
+    }
+
+    @keyframes shakeError {
+      0% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      100% { transform: translateX(0); }
+    }
+
+    #error-ui p {
+      font-size: 1.3rem;
+      margin-bottom: 25px;
+    }
+
+    #error-ui button {
+      background-color: #ff5722;
+      padding: 12px 22px;
+      color: white;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #error-ui button:hover {
+      background-color: #e64a19;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Home Page UI -->
-<div class="home-page" id="home-page">
-  <h1>Welcome to SKYLINE</h1>
-  <p>Your emergency services are just a click away.</p>
-  <button class="button" id="useServiceBtn">Use Our Service</button>
-</div>
+  <!-- Loading Animation (Initially Hidden) -->
+  <div id="loading">
+    <div class="loading-spinner"></div>
+  </div>
 
-<!-- AdBlock Warning Modal -->
-<div id="adblock-warning">
-  <p>It looks like you're using an ad blocker. Please disable it for accurate location services.</p>
-  <button class="button" onclick="manualLocationFallback()">Enter Location Manually</button>
-</div>
+  <!-- Home Page UI -->
+  <div class="home-page" id="home-page">
+    <h1>Welcome to SKYLINE</h1>
+    <p>Your emergency services are just a click away.</p>
+    <button class="button" id="useServiceBtn">Use Our Service</button>
+  </div>
 
-<!-- Manual Location Entry -->
-<div id="manual-location">
-  <p>Enter your location manually:</p>
-  <input type="text" id="manual-location-input" placeholder="City, Region, Country">
-  <button class="button" onclick="confirmManualLocation()">Submit</button>
-</div>
+  <!-- Main Content (Initially Hidden) -->
+  <div class="main-container" id="main-container">
+    <header id="title">
+      <img src="C:/Users/manhh/Downloads/image(1).png" alt="SKYLINE Logo">
+      <h1>SKYLINE</h1>
+      <p>Quick and Reliable Emergency Services</p>
+    </header>
 
-<script>
-  // Detect AdBlock
-  function detectAdBlock() {
-    let adTest = document.createElement('div');
-    adTest.innerHTML = '&nbsp;';
-    adTest.className = 'adsbox';
-    adTest.style.position = 'absolute';
-    adTest.style.left = '-9999px';
-    document.body.appendChild(adTest);
-    
-    window.setTimeout(function() {
-      if (!adTest.offsetHeight || !adTest.offsetWidth) {
-        document.getElementById('adblock-warning').style.display = 'block';
-      }
-      adTest.remove();
-    }, 100);
-  }
+    <!-- Navigation Bar -->
+    <div class="navbar">
+      <a href="javascript:void(0)" id="hospital-link">🏥 Hospital</a>
+      <a href="javascript:void(0)" id="shelter-link">🏠 Shelter</a>
+      <a href="javascript:void(0)" id="food-link">🍲 Food Supply</a>
+      <a href="javascript:void(0)" id="sos-link">🚨 SOS Alert</a>
+      <a href="javascript:void(0)" id="map-link">🗺️ Map</a>
+      <a href="javascript:void(0)" id="about-link">ℹ️ About</a>
+      <a href="javascript:void(0)" id="contact-link">📞 Contact</a>
+    </div>
 
-  // Attach location detection only when specific links are clicked
-  const links = ['hospital-link', 'shelter-link', 'food-link', 'sos-link', 'map-link'];
-  links.forEach(id => {
-    const linkElement = document.getElementById(id);
-    if (linkElement) {
-      linkElement.addEventListener('click', fetchLocation);
+    <footer>
+      <p>&copy; 2024 SKYLINE | Designed for Critical Response</p>
+    </footer>
+  </div>
+
+  <!-- Error UI (Initially Hidden) -->
+  <div id="error-ui">
+    <p>There was an issue fetching your location. Please try again.</p>
+    <button id="retry-button">Retry</button>
+    <button id="close-button">Close</button>
+  </div>
+
+  <!-- Location Confirmation Modal -->
+  <div id="location-confirmation">
+    <p id="location-text"></p>
+    <button id="confirm-location">Yes, this is my location</button>
+    <button id="cancel-location">No, change my location</button>
+  </div>
+
+  <script>
+    // Detect AdBlock
+    function detectAdBlock() {
+      let adTest = document.createElement('div');
+      adTest.innerHTML = '&nbsp;';
+      adTest.className = 'adsbox';
+      adTest.style.position = 'absolute';
+      adTest.style.left = '-9999px';
+      document.body.appendChild(adTest);
+
+      window.setTimeout(function() {
+        if (!adTest.offsetHeight || !adTest.offsetWidth) {
+          document.getElementById('adblock-warning').style.display = 'block';
+        }
+        adTest.remove();
+      }, 100);
     }
-  });
 
-  // Fetch Location
-  function fetchLocation() {
-    detectAdBlock();
-    fetch('https://ipinfo.io/json?token=9445b85126d5ea')
-      .then(response => response.json())
-      .then(data => {
-        alert(`Your location: ${data.city}, ${data.region}, ${data.country}`);
-      })
-      .catch(error => {
-        console.error('Error fetching location:', error);
-        document.getElementById('adblock-warning').style.display = 'block';
-      });
-  }
+    // Start Loading Animation when User Clicks "Use Our Service"
+    document.getElementById('useServiceBtn').addEventListener('click', startLoading);
 
-  // Fallback: Manual Location Entry
-  function manualLocationFallback() {
-    document.getElementById('adblock-warning').style.display = 'none';
-    document.getElementById('manual-location').style.display = 'block';
-  }
+    function startLoading() {
+      detectAdBlock();
+      document.getElementById('home-page').style.display = 'none';
+      document.getElementById('loading').style.visibility = 'visible';
+      document.getElementById('loading').style.opacity = '1';
 
-  function confirmManualLocation() {
-    const location = document.getElementById('manual-location-input').value;
-    if (location) {
-      alert(`Location entered: ${location}`);
-      document.getElementById('manual-location').style.display = 'none';
-    } else {
-      alert('Please enter a valid location.');
+      setTimeout(function() {
+        document.getElementById('loading').style.opacity = '0';
+        document.getElementById('loading').style.visibility = 'hidden';
+        setTimeout(function() {
+          document.getElementById('main-container').style.display = 'flex';
+          document.getElementById('main-container').style.transform = 'scale(1)';
+        }, 500);
+      }, 3000);
     }
-  }
-</script>
+
+    // Open Location Confirmation Modal when clicking on Hospital or other options
+    document.getElementById('hospital-link').addEventListener('click', function() {
+      getLocation();
+    });
+
+    // Fetch User's IP and Location
+    function getLocation() {
+      fetch('https://ipinfo.io/json?token=9445b85126d5ea')
+        .then(response => response.json())
+        .then(data => {
+          const ip = data.ip;
+          const city = data.city;
+          const region = data.region;
+          const country = data.country;
+          const location = `${city}, ${region}, ${country}`;
+
+          // Show location confirmation modal
+          document.getElementById('location-text').textContent = `Is this your location? ${location} (IP: ${ip})`;
+          document.getElementById('location-confirmation').style.display = 'block';
+
+          // Handle Confirm and Cancel buttons
+          document.getElementById('confirm-location').addEventListener('click', function() {
+            alert('Location confirmed!');
+            document.getElementById('location-confirmation').style.display = 'none';
+          });
+
+          document.getElementById('cancel-location').addEventListener('click', function() {
+            alert('Location change requested');
+            document.getElementById('location-confirmation').style.display = 'none';
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching location:', error);
+          document.getElementById('error-ui').style.display = 'block';
+
+          // Retry and close functionality
+          document.getElementById('retry-button').addEventListener('click', function() {
+            document.getElementById('error-ui').style.display = 'none';
+            getLocation();
+          });
+
+          document.getElementById('close-button').addEventListener('click', function() {
+            document.getElementById('error-ui').style.display = 'none';
+          });
+        });
+    }
+  </script>
 </body>
 </html>
